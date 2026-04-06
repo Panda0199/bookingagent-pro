@@ -14,6 +14,14 @@ export const handler = async (event: any) => {
     const body = JSON.parse(event.body || "{}");
     const { message, systemPrompt, bookingMode, faqContent, services } = body;
 
+    const isEstonian =
+      /[õäöüÕÄÖÜ]/.test(message) ||
+      message.toLowerCase().includes("broneeri") ||
+      message.toLowerCase().includes("millised") ||
+      message.toLowerCase().includes("homme") ||
+      message.toLowerCase().includes("saadaval") ||
+      message.toLowerCase().includes("kell");
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
@@ -96,7 +104,8 @@ Rules:
 - If the user asks about services or business details, answer clearly
 - If the user asks about availability, use check_availability
 - If the user provides booking details, use create_booking
-- Reply in the same language as the user when possible.
+- Always reply in the same language as the user
+- If the user writes in Estonian, reply only in Estonian
           `.trim(),
         },
         {
@@ -129,7 +138,11 @@ Rules:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           reply: availableSlots.length
-            ? `Available times on ${args.date}: ${availableSlots.join(", ")}`
+            ? isEstonian
+              ? `Saadaval ajad kuupäeval ${args.date}: ${availableSlots.join(", ")}`
+              : `Available times on ${args.date}: ${availableSlots.join(", ")}`
+            : isEstonian
+            ? `Kuupäeval ${args.date} ei ole vabu aegu`
             : `No availability on ${args.date}`,
         }),
       };
@@ -150,7 +163,9 @@ Rules:
           statusCode: 200,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            reply: `Service "${args.service}" not found.`,
+            reply: isEstonian
+              ? `Teenust "${args.service}" ei leitud.`
+              : `Service "${args.service}" not found.`,
           }),
         };
       }
@@ -168,7 +183,9 @@ Rules:
           statusCode: 200,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            reply: `Sorry, ${args.time} on ${args.date} is already booked. Please choose another available time.`,
+            reply: isEstonian
+              ? `Vabandust, ${args.time} kuupäeval ${args.date} on juba broneeritud. Palun vali teine aeg.`
+              : `Sorry, ${args.time} on ${args.date} is already booked. Please choose another available time.`,
           }),
         };
       }
@@ -213,7 +230,9 @@ Rules:
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          reply: `Booking confirmed for ${args.name} on ${args.date} at ${args.time} for ${service.name}.`,
+          reply: isEstonian
+            ? `Broneering kinnitatud: ${args.name}, ${args.date} kell ${args.time}, teenus: ${service.name}.`
+            : `Booking confirmed for ${args.name} on ${args.date} at ${args.time} for ${service.name}.`,
         }),
       };
     }
@@ -225,14 +244,18 @@ Rules:
         body: JSON.stringify({
           reply:
             faqContent ||
-            "We offer services by appointment. Please ask about pricing, duration, and availability.",
+            (isEstonian
+              ? "Pakume teenuseid ettetellimisel. Küsi hindade, kestuse ja saadavuse kohta."
+              : "We offer services by appointment. Please ask about pricing, duration, and availability."),
         }),
       };
     }
 
     const reply =
       response.output_text?.trim() ||
-      "Sorry, I could not generate a response.";
+      (isEstonian
+        ? "Vabandust, ma ei suutnud vastust koostada."
+        : "Sorry, I could not generate a response.");
 
     return {
       statusCode: 200,
