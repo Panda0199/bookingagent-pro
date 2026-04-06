@@ -1,57 +1,58 @@
-import { Link } from "react-router-dom";
-import { CalendarDays, Users, TrendingUp, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { signOutUser } from "@/lib/auth";
 
-const stats = [
-  { label: "Today's Bookings", value: "12", icon: CalendarDays },
-  { label: "Active Clients", value: "248", icon: Users },
-  { label: "Revenue (MTD)", value: "$8,420", icon: TrendingUp },
-];
+import ServicesManager from "@/components/dashboard/ServicesManager";
+import AgentSettingsManager from "@/components/dashboard/AgentSettingsManager";
+import BookingsManager from "@/components/dashboard/BookingsManager";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Dashboard = () => {
-  // TODO: Replace with Supabase auth check
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const handleLogout = async () => {
+    await signOutUser();
+    navigate("/login");
+  };
+
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b border-border bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-          <h1 className="font-display text-xl font-bold">Dashboard</h1>
-          <Link to="/">
-            <Button variant="ghost" size="sm">
-              <LogOut className="h-4 w-4 mr-2" /> Sign Out
-            </Button>
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen px-6 py-10 bg-gray-50">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">
+              {t("dashboard_title")}
+            </h1>
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {stats.map((stat) => (
-            <Card key={stat.label}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.label}
-                </CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-display font-bold">{stat.value}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-display">Upcoming Appointments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-sm">
-              Connect to your backend to display real appointment data here.
+            <p className="text-gray-600">
+              {t("dashboard_desc")}
             </p>
-          </CardContent>
-        </Card>
-      </main>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+
+            <button
+              onClick={handleLogout}
+              className="rounded-xl bg-black text-white px-4 py-2"
+            >
+              {t("logout")}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-8">
+          <ServicesManager />
+          <AgentSettingsManager />
+          <BookingsManager />
+        </div>
+
+        <footer className="py-8 text-sm text-center mt-10 border-t">
+          {t("footer")} {import.meta.env.VITE_STUDENT_NAME},{" "}
+          {t("team")} {import.meta.env.VITE_TEAM_SLUG}
+        </footer>
+      </div>
     </div>
   );
 };

@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import heroImage from "@/assets/hero-spa.jpg";
 
 const HeroSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -32,26 +35,25 @@ const HeroSection = () => {
           </motion.p>
 
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight mb-6">
-            Unwind. Restore.{" "}
-            <span className="text-gradient-gold">Radiate.</span>
+            {t("hero_title")}
           </h1>
 
           <p className="text-primary-foreground/80 text-lg sm:text-xl mb-8 max-w-lg font-light leading-relaxed">
-            Experience bespoke spa treatments crafted to rejuvenate your body and
-            calm your mind. Book effortlessly with our AI-powered assistant.
+            {t("hero_text")}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Button size="lg" className="text-base px-8">
-              Book Appointment
+              {t("book_now")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
+
             <Button
               variant="outline"
               size="lg"
               className="text-base px-8 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
             >
-              Explore Services
+              {t("hero_button")}
             </Button>
           </div>
         </motion.div>
