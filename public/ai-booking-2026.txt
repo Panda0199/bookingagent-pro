@@ -1,0 +1,38 @@
+Student Name: Anik Joy
+Team Slug: team-mainor
+
+Live URL: https://bookingagentpro.netlify.app/
+Repository URL: https://github.com/Panda0199/bookingagent-pro
+
+Stack Used:
+- Frontend: React (Vite + TypeScript + TailwindCSS)
+- Backend: Netlify Functions
+- Database: Supabase (Auth, Tables, RLS)
+- AI: OpenAI (gpt-4o-mini with function calling)
+- Email: Resend API
+- Deployment: Netlify
+
+Technical Explanation (Function Calling):
+
+The system uses OpenAI's function calling capability to connect natural language user input with backend operations.
+
+Three tools are defined:
+1. check_availability(date)
+   - Queries the Supabase bookings table
+   - Filters out already booked time slots
+   - Returns only available times
+
+2. create_booking(details)
+   - Validates the requested time slot (prevents double booking)
+   - Matches the requested service with the services table
+   - Inserts a new booking into Supabase
+   - Triggers a Netlify function to send confirmation emails via Resend
+
+3. get_business_info()
+   - Returns business-related information from the CMS (agent settings / FAQ)
+
+The AI agent decides which tool to call based on user intent using a structured system prompt.
+
+All chat interactions are processed through a secure Netlify serverless function, ensuring API keys are not exposed on the frontend.
+
+The system maintains a chat history in Supabase for auditing and tracking user interactions.
