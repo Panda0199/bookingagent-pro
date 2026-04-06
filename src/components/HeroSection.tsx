@@ -7,6 +7,23 @@ import heroImage from "@/assets/hero-spa.jpg";
 const HeroSection = () => {
   const { t } = useTranslation();
 
+  const openChat = () => {
+    const chatButton = document.querySelector(
+      'button[class*="fixed bottom-6 right-6"]'
+    ) as HTMLButtonElement | null;
+
+    if (chatButton) {
+      chatButton.click();
+    }
+  };
+
+  const scrollToServices = () => {
+    const servicesSection = document.getElementById("services");
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -43,7 +60,11 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="text-base px-8">
+            <Button
+              size="lg"
+              className="text-base px-8"
+              onClick={openChat}
+            >
               {t("book_now")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -51,7 +72,8 @@ const HeroSection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="text-base px-8 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+              onClick={scrollToServices}
+              className="text-base px-8 border-primary-foreground/30 text-primary-foreground bg-transparent hover:bg-primary-foreground/10"
             >
               {t("hero_button")}
             </Button>
