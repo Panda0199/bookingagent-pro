@@ -205,8 +205,11 @@ Rules:
 
       console.log("about to call send-booking-email");
 
-      const emailResponse = await fetch(
-        "http://localhost:8888/.netlify/functions/send-booking-email",
+      const siteUrl =
+  process.env.URL || "http://localhost:8888";
+
+const emailResponse = await fetch(
+  `${siteUrl}/.netlify/functions/send-booking-email`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
